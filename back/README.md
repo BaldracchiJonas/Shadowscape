@@ -52,3 +52,8 @@ INSERT INTO task (description, user_id, status_id) VALUES
 npx sequelize-cli seed:generate --name statusSeeder
 npx sequelize-cli seed:generate --name userSeeder
 npx sequelize-cli seed:generate --name taskSeeder
+
+## Enable RLS
+ALTER TABLE task ENABLE ROW LEVEL SECURITY;
+CREATE POLICY task_policy ON task
+USING (user_id = current_setting('app.user_id')::INTEGER);

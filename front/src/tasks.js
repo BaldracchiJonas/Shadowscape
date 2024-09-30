@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './App.css';
 
 const Tasks = ({ userId }) => {
     const [tasks, setTasks] = useState([]);
@@ -67,6 +68,7 @@ const Tasks = ({ userId }) => {
 
             setTasks([...tasks, response.data.task]);
             setShowModal(false);
+            setNewTaskDescription('');
         } catch (err) {
             console.error('Failed to create task', err);
         } 
@@ -77,7 +79,9 @@ const Tasks = ({ userId }) => {
 
     return (
         <div>
-            <button onClick={() => setShowModal(true)}>Create New Task</button>
+            <div style={{ textAlign: 'center' }}>
+                <button onClick={() => setShowModal(true)}>Create New Task</button>
+            </div>
 
             {showModal && (
                 <div className="modal">
@@ -93,7 +97,7 @@ const Tasks = ({ userId }) => {
                 </div>
             )}
 
-            <div>
+            <div className="filter-buttons">
                 <button onClick={() => setFilter('All')}>All</button>
                 <button onClick={() => setFilter('Open')}>Open</button>
                 <button onClick={() => setFilter('In Progress')}>In Progress</button>
@@ -101,11 +105,12 @@ const Tasks = ({ userId }) => {
             </div>
 
             {filteredTasks.map((task) => (
-                <div key={task.id}>
+                <div key={task.id} className="task-container">
                     {task.description} (Status: {task.Status.name})
                     <select
                         value={task.status_id}
                         onChange={(e) => handleStatusChange(task.id, e.target.value)}
+                        className="task-select"
                     >
                         <option value="1">Open</option>
                         <option value="2">In Progress</option>
@@ -113,7 +118,6 @@ const Tasks = ({ userId }) => {
                     </select>
                 </div>
             ))}
-
         </div>
     );
 };

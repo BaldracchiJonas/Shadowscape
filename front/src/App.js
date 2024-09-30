@@ -36,8 +36,8 @@ function App() {
     };
 
     async function setSession(userId) {
-        try{
-            axios.post('/api/session', { userId });
+        try {
+            await axios.post('/api/session', { userId });
         } catch (err) {
             console.error('Error setting app.user_id:', err);
             return false;
@@ -45,7 +45,7 @@ function App() {
     }
 
     if (loading) {
-        return <p>Loading users...</p>;
+        return <p className="loading-message">Loading users...</p>;
     }
 
     return (
