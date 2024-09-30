@@ -76,9 +76,6 @@ const Tasks = ({ userId }) => {
 
     return (
         <div>
-            <h1>User {userId}'s Tasks</h1>
-
-            {/* Task filter buttons */}
             <div>
                 <button onClick={() => setFilter('All')}>All</button>
                 <button onClick={() => setFilter('Open')}>Open</button>
@@ -86,22 +83,19 @@ const Tasks = ({ userId }) => {
                 <button onClick={() => setFilter('Done')}>Done</button>
             </div>
 
-            {/* Task list */}
-            <ul>
-                {filteredTasks.map((task) => (
-                    <li key={task.id}>
-                        {task.description} (Status: {task.Status.name})
-                        <select
-                            value={task.status_id}
-                            onChange={(e) => handleStatusChange(task.id, e.target.value)}
-                        >
-                            <option value="1">Open</option>
-                            <option value="2">In Progress</option>
-                            <option value="3">Done</option>
-                        </select>
-                    </li>
-                ))}
-            </ul>
+            {filteredTasks.map((task) => (
+                <div key={task.id}>
+                    {task.description} (Status: {task.Status.name})
+                    <select
+                        value={task.status_id}
+                        onChange={(e) => handleStatusChange(task.id, e.target.value)}
+                    >
+                        <option value="1">Open</option>
+                        <option value="2">In Progress</option>
+                        <option value="3">Done</option>
+                    </select>
+                </div>
+            ))}
 
             {/* Create task button */}
             <button onClick={() => setShowModal(true)}>Create New Task</button>

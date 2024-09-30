@@ -16,6 +16,17 @@ const pool = new Pool({
     port: 5432,
 });
 
+//Get users
+app.get('/api/users', async (req, res) => {
+    try {
+        const users = await User.findAll();
+        res.status(200).json(users);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
 // Get the tasks for a specific user by ID
 app.get('/api/tasks/:userId', async (req, res) => {
     const userId = req.params.userId;
