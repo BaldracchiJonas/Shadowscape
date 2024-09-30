@@ -5,6 +5,8 @@ const { Task, User, Status } = require('./models');
 const app = express();
 const port = 3000;
 
+app.use(express.json());
+
 // Configure PostgreSQL connection
 const pool = new Pool({
     user: 'postgres',
@@ -36,18 +38,20 @@ app.get('/api/tasks/:userId', async (req, res) => {
 
 // Create a new task
 app.post('/api/tasks', async (req, res) => {
-    const { userId, description, statusId } = req.body;
+    const { userId, description } = req.body;
 
-    if (!userId || !description || !statusId) {
-        return res.status(400).json({ error: 'userId, description, and statusId are required' });
+    if (!userId || !description) {
+        return res.status(400).json({ error: 'userId, and description are required' });
     }
 
     try {
-        const task = await Task.create({
+        let task = await Task.create({
             user_id: userId,
             description,
-            status_id: statusId
+            status_id: 1
         });
+        task = task.toJSON();
+        task.Status = { id: 1, name: 'Open' }; 
 
         res.status(201).json({ message: 'Task created', task });
     } catch (err) {
@@ -59,10 +63,10 @@ app.post('/api/tasks', async (req, res) => {
 // Update task
 app.put('/api/tasks/:taskId', async (req, res) => {
     const taskId = req.params.taskId;
-    const { description, statusId } = req.body;
+    const { statusId } = req.body;
 
-    if (!description || !statusId) {
-        return res.status(400).json({ error: 'description and statusId are required' });
+    if (!statusId) {
+        return res.status(400).json({ error: 'statusId is required' });
     }
 
     try {
@@ -72,7 +76,6 @@ app.put('/api/tasks/:taskId', async (req, res) => {
             return res.status(404).json({ error: 'Task not found' });
         }
 
-        task.description = description;
         task.status_id = statusId;
         await task.save();
 
