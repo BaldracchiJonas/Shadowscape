@@ -16,6 +16,44 @@ const pool = new Pool({
     port: 5432,
 });
 
+const userMiddlewareRLS = async (req, res, next) => {
+    const userId = req.body.userId || req.query.userId || req.headers['x-user-id'] || req.params.userId;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'userId is required' });
+    }
+
+    try {
+        const result   = await pool.query(`SHOW app.user_id;`);
+        const UserIdRLS = result.rows[0]['app.user_id'];
+
+        if (UserIdRLS != userId) {
+            return res.status(403).json({ error: 'Unauthorized: UserId does not match' });
+        }
+
+        next();
+    } catch (err) {
+        console.error('Error checking user authorization:', err);
+        res.status(500).json({ error: 'Authorization check failed' });
+    }
+};
+
+app.post('/api/session', async (req, res) => {
+    const userId = req.body.userId || req.query.userId || req.headers['x-user-id'] || req.params.userId;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'userId is required' });
+    }
+
+    try {
+        await pool.query(`SET app.user_id = ${userId};`);
+        res.status(200).json({ message: 'Session set', userId });
+    } catch (err) {
+        console.error('Error setting app.user_id:', err);
+        res.status(500).json({ error: 'Failed to set session' });
+    }
+});
+
 //Get users
 app.get('/api/users', async (req, res) => {
     try {
@@ -28,7 +66,7 @@ app.get('/api/users', async (req, res) => {
 });
 
 // Get the tasks for a specific user by ID
-app.get('/api/tasks/:userId', async (req, res) => {
+app.get('/api/tasks/:userId', userMiddlewareRLS, async (req, res) => {
     const userId = req.params.userId;
     try {
         const tasks = await Task.findAll({
@@ -48,7 +86,7 @@ app.get('/api/tasks/:userId', async (req, res) => {
 });
 
 // Create a new task
-app.post('/api/tasks', async (req, res) => {
+app.post('/api/tasks', userMiddlewareRLS, async (req, res) => {
     const { userId, description } = req.body;
 
     if (!userId || !description) {
@@ -72,7 +110,7 @@ app.post('/api/tasks', async (req, res) => {
 });
 
 // Update task
-app.put('/api/tasks/:taskId', async (req, res) => {
+app.put('/api/tasks/:taskId', userMiddlewareRLS, async (req, res) => {
     const taskId = req.params.taskId;
     const { statusId } = req.body;
 

@@ -31,6 +31,7 @@ const Tasks = ({ userId }) => {
     const handleStatusChange = async (taskId, newStatusId) => {
         try {
             await axios.put(`/api/tasks/${taskId}`, {
+                userId,
                 statusId: newStatusId,
             });
 
@@ -76,6 +77,22 @@ const Tasks = ({ userId }) => {
 
     return (
         <div>
+            <button onClick={() => setShowModal(true)}>Create New Task</button>
+
+            {showModal && (
+                <div className="modal">
+                    <h2>Create New Task</h2>
+                    <label>Description:</label>
+                    <input
+                        type="text"
+                        value={newTaskDescription}
+                        onChange={(e) => setNewTaskDescription(e.target.value)}
+                    />
+                    <button onClick={handleCreateTask}>Create</button>
+                    <button onClick={() => setShowModal(false)}>Cancel</button>
+                </div>
+            )}
+
             <div>
                 <button onClick={() => setFilter('All')}>All</button>
                 <button onClick={() => setFilter('Open')}>Open</button>
@@ -97,23 +114,6 @@ const Tasks = ({ userId }) => {
                 </div>
             ))}
 
-            {/* Create task button */}
-            <button onClick={() => setShowModal(true)}>Create New Task</button>
-
-            {/* Create Task Modal */}
-            {showModal && (
-                <div className="modal">
-                    <h2>Create New Task</h2>
-                    <label>Description:</label>
-                    <input
-                        type="text"
-                        value={newTaskDescription}
-                        onChange={(e) => setNewTaskDescription(e.target.value)}
-                    />
-                    <button onClick={handleCreateTask}>Create</button>
-                    <button onClick={() => setShowModal(false)}>Cancel</button>
-                </div>
-            )}
         </div>
     );
 };

@@ -16,6 +16,7 @@ function App() {
 
                 setUsers(usersData);
                 if (usersData.length > 0) {
+                    await setSession(usersData[0].id);
                     setUserId(usersData[0].id);
                 }
                 setLoading(false);
@@ -28,9 +29,20 @@ function App() {
         fetchUsers();
     }, []);
 
-    const handleUserChange = (e) => {
-        setUserId(e.target.value);
+    const handleUserChange = async (e) => {
+        const userId = e.target.value;
+        await setSession(userId);
+        setUserId(userId);
     };
+
+    async function setSession(userId) {
+        try{
+            axios.post('/api/session', { userId });
+        } catch (err) {
+            console.error('Error setting app.user_id:', err);
+            return false;
+        }
+    }
 
     if (loading) {
         return <p>Loading users...</p>;
