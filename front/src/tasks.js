@@ -35,10 +35,16 @@ const Tasks = ({ userId }) => {
                 userId,
                 statusId: newStatusId,
             });
-
+    
             setTasks(prevTasks =>
                 prevTasks.map(task =>
-                    task.id === taskId ? { ...task, status_id: newStatusId, Status: { name: getStatusName(newStatusId) } } : task
+                    task.id === taskId 
+                        ? { 
+                            ...task, 
+                            status_id: newStatusId, 
+                            Status: { ...task.Status, name: getStatusName(newStatusId) }
+                            } 
+                        : task
                 )
             );
         } catch (err) {
@@ -48,11 +54,11 @@ const Tasks = ({ userId }) => {
 
     const getStatusName = (statusId) => {
         switch (statusId) {
-            case 1:
+            case "1":
                 return 'Open';
-            case 2:
+            case "2":
                 return 'In Progress';
-            case 3:
+            case "3":
                 return 'Done';
             default:
                 return 'Unknown';
